@@ -43,5 +43,11 @@ out/
 # Log file
 *.log
 
-#env
+### env ###
 env.yml
+
+
+.jqwik-database
+
+# yml
+*.yml
