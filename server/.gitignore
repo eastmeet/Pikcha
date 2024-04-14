@@ -50,4 +50,4 @@ env.yml
 .jqwik-database
 
 # yml
-*.yml
+application-server.yml
