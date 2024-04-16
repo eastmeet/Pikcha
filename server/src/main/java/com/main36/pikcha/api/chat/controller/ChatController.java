@@ -1,4 +1,4 @@
-package com.main36.pikcha.domain.chat.controller;
+package com.main36.pikcha.api.chat.controller;
 
 import com.main36.pikcha.domain.chat.dto.*;
 import com.main36.pikcha.domain.chat.entity.ChatMessage;

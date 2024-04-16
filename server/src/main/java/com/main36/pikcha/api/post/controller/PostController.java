@@ -1,4 +1,4 @@
-package com.main36.pikcha.domain.post.controller;
+package com.main36.pikcha.api.post.controller;
 
 
 import com.amazonaws.AmazonServiceException;

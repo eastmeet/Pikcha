@@ -1,4 +1,4 @@
-package com.main36.pikcha.domain.member.controller;
+package com.main36.pikcha.api.member.controller;
 
 
 import com.main36.pikcha.domain.member.dto.MemberDto;

@@ -1,4 +1,4 @@
-package com.main36.pikcha.domain.comment.controller;
+package com.main36.pikcha.api.comment.controller;
 
 import com.main36.pikcha.domain.comment.dto.CommentDetailResponseDto;
 import com.main36.pikcha.domain.comment.dto.CommentDto;

@@ -1,4 +1,4 @@
-package com.main36.pikcha.domain.attraction.controller;
+package com.main36.pikcha.api.attraction.controller;
 
 
 import com.main36.pikcha.domain.attraction.dto.*;
