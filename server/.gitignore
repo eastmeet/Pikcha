@@ -46,8 +46,4 @@ out/
 ### env ###
 env.yml
 
-
 .jqwik-database
-
-# yml
-application-server.yml
