@@ -60,5 +60,6 @@ public class Attraction extends Auditable {
     private Long rankChange;*/
 
     @OneToMany(mappedBy = "attraction", cascade = CascadeType.REMOVE)
+    @Builder.Default
     private List<Post> posts = new ArrayList<>();
 }

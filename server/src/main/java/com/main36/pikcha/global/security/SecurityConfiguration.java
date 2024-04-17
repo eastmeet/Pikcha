@@ -81,14 +81,7 @@ public class SecurityConfiguration {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(
-                List.of(
-                        "http://localhost:3000",
-                        "http://127.0.0.1:3000",
-                        "http://pikcha36.o-r.kr/",
-                        "https://pikcha36.o-r.kr/",
-                        "http://pikcha36.s3-website.ap-northeast-2.amazonaws.com/")
-        );
+        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://127.0.0.1:3000", "http://pikcha.kr/", "https://pikcha.kr/"));
         configuration.setAllowCredentials(true);
         configuration.addExposedHeader("Authorization");
         configuration.addAllowedHeader("*");

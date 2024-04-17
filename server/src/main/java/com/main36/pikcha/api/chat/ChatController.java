@@ -1,4 +1,4 @@
-package com.main36.pikcha.api.chat.controller;
+package com.main36.pikcha.api.chat;
 
 import com.main36.pikcha.domain.chat.dto.*;
 import com.main36.pikcha.domain.chat.entity.ChatMessage;
@@ -9,8 +9,8 @@ import com.main36.pikcha.domain.connection.repository.ConnectionRepository;
 import com.main36.pikcha.domain.member.entity.Member;
 import com.main36.pikcha.domain.member.service.MemberService;
 import com.main36.pikcha.global.aop.LoginUser;
-import com.main36.pikcha.global.response.DataAndHasNextResponseDto;
-import com.main36.pikcha.global.response.DataResponseDto;
+import com.main36.pikcha.global.response.*;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Slice;
@@ -44,8 +44,10 @@ public class ChatController {
     private static final String ROUTING_KEY = "messages";
 
 
-    // 테스트용 채팅 생성 메서드
+    @Operation(summary = "테스트용 채팅 생성 메서드")
     @PostMapping("/chat/test")
+    @PostApiResponse
+    @SwaggerErrorResponses
     public ResponseEntity testChat(@RequestBody ChatPostDto chatPostDto) {
         log.info("content = {}", chatPostDto.getContent());
         chatPostDto.setContent("안녕하세요");
@@ -68,7 +70,7 @@ public class ChatController {
         System.out.println("received : " + message);
     }*/
 
-    // 받은 채팅 저장 후 뿌리기
+    @Operation(summary = "받은 채팅 저장 후 뿌리기")
     @MessageMapping("/chat")
 //  @SendTo: 애노테이션으로 적용되며, 메서드 반환 값이 메시지로 자동 변환되어 대상에게 전송됩니다.
     public void processMessage(ChatPostDto chatPostDto) {
@@ -90,7 +92,7 @@ public class ChatController {
         }
     }
 
-    // 채팅에 답장하기
+    @Operation(summary = "채팅에 답장하기")
     @MessageMapping("/reply")
     public void replyMessage(ChatReplyDto chatReplyDto) {
         Member member = memberService.findMemberByMemberId(chatReplyDto.getMemberId());
@@ -106,6 +108,8 @@ public class ChatController {
 
     // 채팅 삭제하기
     @DeleteMapping("/app/delete")
+    @DeleteApiResponse
+    @SwaggerErrorResponses
     public ResponseEntity deleteMessages(@RequestBody ChatDeleteDto chatDeleteDto) {
         List<Long> ids = chatDeleteDto.getIds();
         Long memberId = chatDeleteDto.getMemberId();
@@ -128,6 +132,8 @@ public class ChatController {
     // 채팅방 입장했을 시 채팅목록 불러오기
     @GetMapping("/app/enter")
     @LoginUser
+    @GetApiResponse
+    @SwaggerErrorResponses
     public ResponseEntity getInitMessages(Member loginUser){
         List<ChatMessage> messageList = chatService.getInitialMessages();
         Collections.reverse(messageList);
@@ -137,6 +143,8 @@ public class ChatController {
     // 범위 안에서 채팅 20개 id 내림차순으로 반환
     @GetMapping("/app/load")
     @LoginUser
+    @GetApiResponse
+    @SwaggerErrorResponses
     public ResponseEntity getRangedMessages(Member loginUser,
                                                @Positive @RequestParam(required = false) Optional<Long> gte,
                                                @Positive @RequestParam(required = false) Optional<Long> lte
@@ -170,6 +178,8 @@ public class ChatController {
 
     @GetMapping("/app/load/{chat-id}")
     @LoginUser
+    @GetApiResponse
+    @SwaggerErrorResponses
     public ResponseEntity getMoreMessagesAfter(Member loginUser,
                                                @PathVariable(value = "chat-id", required = true) Long lastChatId){
         List<ChatMessage> messageList = chatService.getMoreMessagesLessThan(lastChatId);
@@ -202,6 +212,8 @@ public class ChatController {
 
     // 연도&월을 기준 특정 검색어로 채팅 검색하기
     @GetMapping("/app/search")
+    @GetApiResponse
+    @SwaggerErrorResponses
     public ResponseEntity findMessagesBetween(@Positive @RequestParam(required = true) String content,
                                               @Positive @RequestParam(required = true) String yearAndMonth){
         List<ChatMessage> messageList = chatService.getMessagesBetween(content, yearAndMonth);
@@ -211,6 +223,8 @@ public class ChatController {
     // 채팅 좋아요
     @LoginUser
     @PostMapping("/app/likes/{chat-id}")
+    @PostApiResponse
+    @SwaggerErrorResponses
     public void likeMessage(Member loginUser,
                                @PathVariable("chat-id") @Positive long chatId) {
 
@@ -234,6 +248,8 @@ public class ChatController {
     // 채팅 신고
     @LoginUser
     @PostMapping("/app/report/{chat-id}")
+    @PostApiResponse
+    @SwaggerErrorResponses
     public ResponseEntity reportMessage(Member loginUser,
                               @PathVariable("chat-id") @Positive long chatId) {
 //        ChatMessage findChatMessage = chatService.findVerifiedChatMessage(chatId);

@@ -69,6 +69,12 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
 
             filterChain.doFilter(request, response);
 
+        } catch (io.jsonwebtoken.io.DecodingException e) {
+            // Handle the decoding exception
+            log.error("Error decoding JWT token: {}", e.getMessage());
+            // Return an appropriate error response to the client
+            // ...
+
         } catch (RuntimeException e) {
 
             if (e instanceof BusinessLogicException) {

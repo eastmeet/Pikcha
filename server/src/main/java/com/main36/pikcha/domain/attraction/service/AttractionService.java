@@ -86,7 +86,6 @@ public class AttractionService {
 
     public void deleteAttraction(long attractionId){
         Attraction findAttraction = findVerifiedAttraction(attractionId);
-
         attractionRepository.delete(findAttraction);
     }
 

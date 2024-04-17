@@ -43,17 +43,21 @@ public class Post extends Auditable {
     private Attraction attraction;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
+    @Builder.Default
     private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
     @JoinColumn(name = "post_id")
+    @Builder.Default
     private List<PostImage> postImages = new ArrayList<>();
 
     @OneToMany(cascade = {CascadeType.PERSIST,  CascadeType.REMOVE}, orphanRemoval = true)
     @JoinColumn(name = "post_id")
+    @Builder.Default
     private List<HashTag> hashTags = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST,  CascadeType.REMOVE}, orphanRemoval = true)
+    @Builder.Default
 //    @JoinColumn(name = "post_id")
     private List<PostLikes> postLikes = new ArrayList<>();
 
@@ -61,5 +65,6 @@ public class Post extends Auditable {
     @CollectionTable(name = "contents", joinColumns = @JoinColumn(name= "post_id"))
     @OrderColumn
     @Column(name = "post_contents")
+    @Builder.Default
     private List<String> postContents = new ArrayList<>();
 }

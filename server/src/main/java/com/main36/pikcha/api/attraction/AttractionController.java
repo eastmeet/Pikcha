@@ -1,4 +1,4 @@
-package com.main36.pikcha.api.attraction.controller;
+package com.main36.pikcha.api.attraction;
 
 
 import com.main36.pikcha.domain.attraction.dto.*;
@@ -11,9 +11,10 @@ import com.main36.pikcha.domain.post.dto.PostResponseDto;
 import com.main36.pikcha.domain.post.entity.Post;
 import com.main36.pikcha.global.aop.LoginUser;
 
-import com.main36.pikcha.global.response.DataResponseDto;
-import com.main36.pikcha.global.response.MultiResponseDto;
+import com.main36.pikcha.global.response.*;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -34,38 +35,19 @@ import java.util.stream.Collectors;
 @RequestMapping("/attractions")
 @RequiredArgsConstructor
 @Validated
+@Tag(name = "[사용자] Attraction", description = "명소 관련 사용자 API 입니다.")
 public class AttractionController {
 
     private final AttractionService attractionService;
+
     private final AttractionMapper mapper;
+
     private final MemberService memberService;
 
-    // 1. 관리자 페이지(명소 등록)
-    @PostMapping("/upload")
-    public ResponseEntity<DataResponseDto<?>> postAttraction(AttractionPostDto attractionPostDto) throws IOException {
-
-        Attraction attraction = mapper.attractionPostDtoToAttraction(attractionPostDto);
-        AttractionResponseDto response =
-                mapper.attractionToAttractionResponseDto(attractionService.createAttraction(attraction));
-
-        return new ResponseEntity<>(new DataResponseDto<>(response), HttpStatus.CREATED);
-    }
-
-    // 2. 관리자 페이지(명소 수정)
-    @PatchMapping("/edit/{attraction-id}")
-    public ResponseEntity<DataResponseDto<?>> patchAttraction(@PathVariable("attraction-id") @Positive long attractionId,
-                                                              AttractionPatchDto attractionPatchDto) throws IOException {
-
-        attractionPatchDto.setAttractionId(attractionId);
-        Attraction attraction = mapper.attractionPatchDtoToAttraction(attractionPatchDto);
-        AttractionResponseDto response =
-                mapper.attractionToAttractionResponseDto(attractionService.updateAttraction(attraction));
-
-        return new ResponseEntity<>(new DataResponseDto<>(response), HttpStatus.OK);
-    }
-
-    // 3. 명소 상세페이지 (비로그인, 로그인)
     // 반환하는  정보 : 명소 정보(Id,이름, 설명, 주소, 이미지 주소), 좋아요 수, 좋아요 눌렀는지, 즐겨찾기 수, 즐겨찾기 눌렀는지
+    @Operation(summary = "명소 상세페이지 (비로그인, 로그인)")
+    @GetApiResponse
+    @SwaggerErrorResponses
     @GetMapping(value = {"/{attraction-id}", "/{attraction-id}/{member-id}"})
     public ResponseEntity<DataResponseDto<?>> getAttraction(@PathVariable("attraction-id") @Positive long attractionId,
                                                             @PathVariable(value = "member-id", required = false) Optional<Long> memberId) {
@@ -83,8 +65,10 @@ public class AttractionController {
         return new ResponseEntity<>(new DataResponseDto<>(response), HttpStatus.OK);
     }
 
-    // 4. 명소 메인페이지(찾는 '구' 리스트를 받아 명소 Id 기준으로 명소 여러개의 정보 요청을 처리하는 핸들러)
+    @Operation(summary = "명소 메인페이지(찾는 '구' 리스트를 받아 명소 Id 기준으로 명소 여러개의 정보 요청을 처리하는 핸들러) ")
     @PostMapping(value = {"/filter", "/filter/{member-id}"})
+    @PostApiResponse
+    @SwaggerErrorResponses
     public ResponseEntity<MultiResponseDto<?>> getFilteredAttractions(@PathVariable("member-id") Optional<Long> memberId,
                                                                       @Positive @RequestParam(required = false, defaultValue = "1") int page,
                                                                       @Positive @RequestParam(required = false, defaultValue = "9") int size,
@@ -103,9 +87,10 @@ public class AttractionController {
         return responseMethod(attractions, attractionPage, memberId);
     }
 
-
-    // 5. 명소 지도페이지(지도에 지역구로 명소 표시 :  명소의 id, 이름, 주소, 사진url)
+    @Operation(summary = "명소 지도페이지(지도에 지역구로 명소 표시 :  명소의 id, 이름, 주소, 사진url)" )
     @PostMapping("/maps")
+    @PostApiResponse
+    @SwaggerErrorResponses
     public ResponseEntity<MultiResponseDto<?>> getMapsAttractions(@Positive @RequestParam(required = false, defaultValue = "1") int page,
                                                                   @Positive @RequestParam(required = false, defaultValue = "100") int size,
                                                                   @RequestParam(required = false, defaultValue = "newest") String sort,
@@ -123,8 +108,10 @@ public class AttractionController {
                 mapper.attractionsToAttractionMapsResponseDtos(attractions), attractionPage), HttpStatus.OK);
     }
 
-    // 6. 메인페이지
+    @Operation(summary = "메인페이지")
     @GetMapping(value = {"/home", "/home/{member-id}"})
+    @GetApiResponse
+    @SwaggerErrorResponses
     public ResponseEntity<MultiResponseDto<?>> getAttractions(@PathVariable("member-id") Optional<Long> memberId,
                                                               @Positive @RequestParam(required = false, defaultValue = "1") int page,
                                                               @Positive @RequestParam(required = false, defaultValue = "9") int size) {
@@ -134,8 +121,10 @@ public class AttractionController {
         return responseMethod(attractions, attractionPage, memberId);
     }
 
-    // 7. 명소 검색
+    @Operation(summary = "명소 검색")
     @PostMapping(value = {"/search", "/search/{member-id}"})
+    @PostApiResponse
+    @SwaggerErrorResponses
     public ResponseEntity<MultiResponseDto<?>> getSearchedAttractions(@PathVariable("member-id") Optional<Long> memberId,
                                                                       @Positive @RequestParam(required = false, defaultValue = "1") int page,
                                                                       @Positive @RequestParam(required = false, defaultValue = "9") int size,
@@ -155,17 +144,12 @@ public class AttractionController {
         return responseMethod(attractions, attractionPage, memberId);
     }
 
-    // 8. 관리자페이지(명소 삭제)
-    @DeleteMapping("/delete/{attraction-id}")
-    public ResponseEntity<HttpStatus> deleteAttraction(@PathVariable("attraction-id") @Positive long attractionId) {
-        attractionService.deleteAttraction(attractionId);
-
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
     // 9. 명소 좋아요!
+    @Operation(summary = "명소 좋아요")
     @LoginUser
     @PostMapping("/likes/{attraction-id}")
+    @PostApiResponse
+    @SwaggerErrorResponses
     public ResponseEntity<DataResponseDto<?>> voteAttraction(Member loginUser,
                                                              @PathVariable("attraction-id") @Positive long attractionId) {
 
@@ -178,10 +162,11 @@ public class AttractionController {
 
         return new ResponseEntity<>(new DataResponseDto<>(response), HttpStatus.OK);
     }
-
-    // 10. 명소 즐겨찾기
+    @Operation(summary = "명소 즐겨찾기")
     @LoginUser
     @PostMapping("/saves/{attraction-id}")
+    @PostApiResponse
+    @SwaggerErrorResponses
     public ResponseEntity<DataResponseDto<?>> saveAttraction(Member loginUser,
                                                              @PathVariable("attraction-id") @Positive long attractionId) {
 
@@ -195,8 +180,10 @@ public class AttractionController {
         return new ResponseEntity<>(new DataResponseDto<>(response), HttpStatus.OK);
     }
 
-    // 11. 명소 지도(map) 상세 페이지
+    @Operation(summary = "명소 지도(map) 상세 페이지")
     @GetMapping(value = {"/mapdetails/{attraction-id}", "/mapdetails/{attraction-id}/{member-id}"})
+    @GetApiResponse
+    @SwaggerErrorResponses
     public ResponseEntity getMapDetails(@PathVariable(value = "member-id", required = false) Long memberId,
                                         @PathVariable("attraction-id") @Positive long attractionId) {
         Attraction attraction = attractionService.findAttraction(attractionId);
@@ -233,7 +220,10 @@ public class AttractionController {
         return new ResponseEntity<>(new DataResponseDto<>(response), HttpStatus.OK);
     }
 
+    @Operation(summary = "랭크")
     @GetMapping("/main/rank")
+    @GetApiResponse
+    @SwaggerErrorResponses
     public ResponseEntity getRankedAttractions(@Positive @RequestParam(required = false, defaultValue = "1") int page,
                                                @Positive @RequestParam(required = false, defaultValue = "10") int size,
                                                @RequestParam(required = false, defaultValue = "likes") String sort){

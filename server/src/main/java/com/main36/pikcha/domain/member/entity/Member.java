@@ -50,12 +50,15 @@ public class Member extends Auditable {
     private String picture;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    @Builder.Default
     private List<Post> posts = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    @Builder.Default
     private List<Save> saves = new ArrayList<>();
 
     @ElementCollection(fetch = FetchType.EAGER)
+    @Builder.Default
     private List<String> roles = new ArrayList<>();
 
     public Member(String oauthId, String name, String email, String imageUrl, List<String> roles, PasswordEncoder passwordEncoder) {

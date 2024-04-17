@@ -36,6 +36,7 @@ public class Comment extends Auditable {
     private Member member;
 
     @Convert(converter = CommentStatusConverter.class)
+    @Builder.Default
     private CommentStatus status = CommentStatus.Alive;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -51,6 +52,7 @@ public class Comment extends Auditable {
     }
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "parent", orphanRemoval = true)
+    @Builder.Default
     private List<Comment> children = new ArrayList<>();
 
     public List<Comment> getChildren(){

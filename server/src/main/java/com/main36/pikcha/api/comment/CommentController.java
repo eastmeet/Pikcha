@@ -1,4 +1,4 @@
-package com.main36.pikcha.api.comment.controller;
+package com.main36.pikcha.api.comment;
 
 import com.main36.pikcha.domain.comment.dto.CommentDetailResponseDto;
 import com.main36.pikcha.domain.comment.dto.CommentDto;
@@ -10,8 +10,8 @@ import com.main36.pikcha.domain.member.entity.Member;
 import com.main36.pikcha.domain.post.entity.Post;
 import com.main36.pikcha.domain.post.service.PostService;
 import com.main36.pikcha.global.aop.LoginUser;
-import com.main36.pikcha.global.response.DataResponseDto;
-import com.main36.pikcha.global.response.MultiResponseDto;
+import com.main36.pikcha.global.response.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -22,23 +22,26 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @Slf4j
 @RequestMapping("/comments")
 @RequiredArgsConstructor
 @Validated
+@Tag(name = "[Comment] 댓글", description = "명소 관련 사용자 API 입니다.")
 public class CommentController {
+
     private final CommentService commentService;
+
     private final PostService postService;
+
     private final CommentMapper mapper;
 
     @LoginUser
     @PostMapping("/upload/{post-id}")
+    @PostApiResponse
+    @SwaggerErrorResponses
     public ResponseEntity<DataResponseDto<?>> postComment(Member loginUser,
                                                           @PathVariable("post-id") @Positive long postId,
                                                           @RequestBody @Valid CommentDto.Post commentPostDto) {
@@ -61,6 +64,8 @@ public class CommentController {
 
     @LoginUser
     @PatchMapping("/edit/{comment-id}")
+    @PatchApiResponse
+    @SwaggerErrorResponses
     public ResponseEntity<DataResponseDto<?>> patchComment(Member loginUser,
                                                            @PathVariable("comment-id") @Positive long commentId,
                                                            @RequestBody @Valid CommentDto.Patch commentPatchDto) {
@@ -116,12 +121,13 @@ public class CommentController {
 
     @LoginUser
     @DeleteMapping("/delete/{comment-id}")
-    public ResponseEntity<HttpStatus> deleteComment(Member loginUser,
-                                                    @PathVariable("comment-id") @Positive long commentId) {
+    @DeleteApiResponse
+    @SwaggerErrorResponses
+    public ResponseEntity<Objects> deleteComment(Member loginUser,
+                                                 @PathVariable("comment-id") @Positive long commentId) {
         Comment comment = commentService.verifyClientId(loginUser.getMemberId(), commentId);
         commentService.deleteComment(comment);
-
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return ResponseEntity.noContent().build();
     }
 
 }
